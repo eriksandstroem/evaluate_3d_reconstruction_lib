@@ -42,10 +42,10 @@ The main function of the library is
 The main function can be called in two principled ways:
 
 1. As an executable directly from the command line as:
-<pre><code>evaluate_3d_reconstruction.py pred_ply scene transformation</code></pre>,
-or
+<pre><code>evaluate_3d_reconstruction.py pred_ply scene transformation</code></pre>
+,or
 <pre><code>evaluate_3d_reconstruction.py pred_ply scene</code></pre>
-if the predicted and ground truth meshes are already aligned. To achieve this, run <pre><code>chmod +x evaluate_3d_reconstructio.py</code></pre> and export the path to the script in your bashrc-file i.e. add similar to the following to your bashrc: <pre><code># Export path to my python evaluate 3d reconstruction script
+if the predicted and ground truth meshes are already aligned. To achieve this, run <pre><code>chmod +x evaluate_3d_reconstruction.py</code></pre> and export the path to the script in your bashrc-file i.e. add similar to the following to your bashrc: <pre><code># Export path to my python evaluate 3d reconstruction script
 export PATH="/cluster/project/cvl/esandstroem/src/late_fusion_3dconv/deps/evaluate_3d_reconstruction/evaluate_3d_reconstruction:$PATH"</code></pre>
 
 2. As a normal function in other python scripts. To achieve this, simply import the function using <pre><code>from evaluate_3d_reconstruction import run_evaluation</code></pre>
