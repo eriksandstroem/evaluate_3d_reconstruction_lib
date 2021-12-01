@@ -1,2 +1,3 @@
-# evaluate_3d_reconstruction
-Given an input mesh, computes the F-score. This assumes that an appropriate path to the ground truth mesh is available.
+Put usage guide and description of library
+
+Make sure to set your personal paths in the config.py file
