@@ -1,3 +1,4 @@
+# Legacy script - not used anymore
 import os
 import numpy as np
 path = '/home/esandstroem/scratch-second/opportunistic_3d_capture/Erik_3D_Reconstruction_Project/src/RoutedFusion/workspace/fusion/multidepth_routingNet/test/'

@@ -1,3 +1,5 @@
+# This script is modified from the original source by Erik Sandstroem
+
 # ----------------------------------------------------------------------------
 # -                   TanksAndTemples Website Toolbox                        -
 # -                    http://www.tanksandtemples.org                        -
@@ -29,13 +31,9 @@
 # THE SOFTWARE.
 # ----------------------------------------------------------------------------
 
-# Modified by Erik Sandstroem
+# declare global variables
 
-watertight_ground_truth_data_base = "/cluster/work/cvl/esandstroem/data/ground_truth_data/gt_mesh_poisson"
-
-standard_trunc_ground_truth_data_base = "/cluster/work/cvl/esandstroem/data/ground_truth_data/standard_truncation_0.1"
-
-base_evaluation_dir = "/home/esandstroem/scratch-second/opportunistic_3d_capture/Erik_3D_Reconstruction_Project/3rdparty/evaluate_3d_reconstruction/data/replica"
+ground_truth_data_base = "/cluster/work/cvl/esandstroem/data/ground_truth_data/standard_truncation_0.1"
 
 base_transformation_dir = "/cluster/project/cvl/esandstroem/3rdparty/evaluate_3d_reconstruction/data/transformation_matrices"
 

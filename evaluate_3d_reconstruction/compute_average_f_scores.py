@@ -1,3 +1,5 @@
+# Legacy script - not used anymore
+
 # This script computes the average F-scores for the methods
 # TSDF Fusion
 # COLMAP
@@ -7,6 +9,7 @@
 
 # The average is taken over the scenes office_0, office_4 and hotel_0
 # The result is printed in the terminal
+
 import os
 import numpy as np
 

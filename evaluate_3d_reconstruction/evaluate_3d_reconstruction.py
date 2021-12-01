@@ -1,6 +1,8 @@
 #!/cluster/project/cvl/esandstroem/virtual_envs/multisensor_env_python_gpu_3.8.5/bin/python
 import os
 
+# This script is modified from the original source by Erik Sandstroem
+
 # ----------------------------------------------------------------------------
 # -                   TanksAndTemples Website Toolbox                        -
 # -                    http://www.tanksandtemples.org                        -
@@ -31,22 +33,8 @@ import os
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 # ----------------------------------------------------------------------------
-#
-# This python script is for downloading dataset from www.tanksandtemples.org
-# The dataset has a different license, please refer to
-# https://tanksandtemples.org/license/
 
-# this script requires Open3D python binding
-# please follow the intructions in setup.py before running this script.
-
-# This is script is modified by Erik Sandstroem
-
-# Run this script in the folder of the target .ply file by providing the name of the .ply file as
-# the input. The evaluation output is stored in the corresponding folder located in the data folder
-# of this script.
-
-# example use case: go to the directory where the reconstructed .ply file is located
-# then run evaluate_3d_reconstruction.py somename.ply
+# See README.md file for usage instructions
 
 import numpy as np
 import open3d as o3d
@@ -58,23 +46,37 @@ from evaluate_3d_reconstruction.evaluation import EvaluateHisto
 from evaluate_3d_reconstruction.util import make_dir
 from evaluate_3d_reconstruction.plot import plot_graph
 
-def run_evaluation(pred_ply, ground_truth_data, scene, path_to_pred_ply, transformation=None):
+def run_evaluation(pred_ply, path_to_pred_ply, scene, transformation=None):
+    """
+    Calculates the F-score from a predicted mesh to a reference mesh. Generates
+    a directory and fills this numerical and mesh results.
+
+    Args:
+        pred_ply: string object to denote the name of predicted mesh (as a .ply file)
+        scene: string object to denote the scene name (a corresponding ground 
+                    truth .ply file with the name "scene + .ply" needs to exist)
+        path_to_pred_ply: string object to denote the full path to the pred_ply file
+
+    Returns:
+        None
+    """
+
+    # load transformation matrix
     if transformation:
         gt_trans = np.loadtxt(base_transformation_dir + '/' + scene + '/' + transformation)
     else:
         gt_trans = np.eye(4)
 
-    if ground_truth_data == 'watertight':
-        gt_ply_path = watertight_ground_truth_data_base + '/' + scene + '_processed.ply' # ground truth .ply file
-    elif ground_truth_data == 'standard_trunc':
-        gt_ply_path = standard_trunc_ground_truth_data_base + '/' + scene + '.ply' 
-    elif ground_truth_data == 'artificial_trunc':
-        gt_ply_path = artificial_trunc_ground_truth_data_base + '/' + scene + '.ply' 
+    # specify path to ground truth mesh
+    gt_ply_path = ground_truth_data_base + '/' + scene + '.ply' 
 
+    # full path to predicted mesh
     pred_ply_path = path_to_pred_ply + '/' + pred_ply
 
+    # output directory
     out_dir = path_to_pred_ply + '/' + pred_ply[:-4]
 
+    # create output directory
     make_dir(out_dir)
 
     print("")
@@ -84,29 +86,17 @@ def run_evaluation(pred_ply, ground_truth_data, scene, path_to_pred_ply, transfo
 
     dTau = 0.02 # constant Tau regardless of scene size
 
-    # Load reconstruction and according GT
-    # Use these four lines below to also load the normals from the mesh. Note
-    # the implementation is not complete - I turned off the normal estimation
-    # step in evaluation.py because this caused artifacts. Instead
-    # what I need to do is to make sure that the normals which I load here
-    # are kept thorugh the cropping and downsampling function of the point cloud.
-    # mesh = trimesh.load(pred_ply_path)
-    # pcd = o3d.geometry.PointCloud()
-    # pcd.points = o3d.utility.Vector3dVector(np.asarray(mesh.vertices))
-    # pcd.normals = o3d.utility.Vector3dVector(np.asarray(mesh.vertex_normals))
+    # Load reconstruction and corresponding GT
     pcd = o3d.io.read_point_cloud(pred_ply_path) # samples the vertex coordinate points of the mesh
     mesh = o3d.io.read_triangle_mesh(pred_ply_path) # mesh which we want to color for precision
-    # print('pcd: ', np.asarray(pcd.points).shape)
-    # m = o3d.io.read_triangle_mesh(pred_ply_path)
-    # print('m: ', np.asarray(m.vertices).shape)
 
     gt_pcd = o3d.io.read_point_cloud(gt_ply_path)
-    gt_mesh = o3d.io.read_triangle_mesh(gt_ply_path) # mesh to color for recall
+    gt_mesh = o3d.io.read_triangle_mesh(gt_ply_path) # mesh which we want to color for recall
 
     dist_threshold = dTau
     voxel_size = 0.01
 
-    # Histogramms and P/R/F1
+    # Histograms and P/R/F
     plot_stretch = 5
     [
         precision,
@@ -182,9 +172,9 @@ if __name__ == "__main__":
 
     pred_ply = argv[1] # name of predicted .ply file
     ground_truth_data = argv[2] # watertight or artificial_trunc or standard_trunc 
-    scene = argv[3] # scene
+    scene = argv[3] # scene name
     if len(argv) == 5:
-        transformation= argv[4] # open3d or lewiner
+        transformation= argv[4] # transformation matrix to be applied if the meshes are not aligned
     else:
         transformation=None
 

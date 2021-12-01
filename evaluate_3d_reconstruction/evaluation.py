@@ -1,3 +1,5 @@
+# This script is modified from the original source by Erik Sandstroem
+
 # ----------------------------------------------------------------------------
 # -                   TanksAndTemples Website Toolbox                        -
 # -                    http://www.tanksandtemples.org                        -
@@ -28,10 +30,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 # ----------------------------------------------------------------------------
-#
-# This python script is for downloading dataset from www.tanksandtemples.org
-# The dataset has a different license, please refer to
-# https://tanksandtemples.org/license/
 
 import json
 import copy
@@ -62,8 +60,10 @@ def write_color_distances_pcd(path, pcd, distances, max_distance):
     #cmap = plt.get_cmap("winter")
     cmap = plt.get_cmap("hsv")
     distances = np.array(distances)
-    #colors = cmap(np.minimum(distances, max_distance) / max_distance)[:, :3] # This is the original line that I replaced below
-    # I replaced it because the above line does not give a linear mapping between the color values from minimum distance to maximum distance as the histogram colorization does. Now they are aligned.
+    #colors = cmap(np.minimum(distances, max_distance) / max_distance)[:, :3] # This is 
+    # the original line that I replaced below. I replaced it because the above line does 
+    # not give a linear mapping between the color values from minimum distance to maximum 
+    # distance as the histogram colorization does. Now they are aligned.
     max_dist = 0.05
     # c = distances/np.amax(distances.flatten())
     c = distances/max_dist
@@ -88,8 +88,10 @@ def write_color_distances_mesh(path, mesh, distances, max_distance):
     #cmap = plt.get_cmap("winter")
     cmap = plt.get_cmap("hsv")
     distances = np.array(distances)
-    #colors = cmap(np.minimum(distances, max_distance) / max_distance)[:, :3] # This is the original line that I replaced below
-    # I replaced it because the above line does not give a linear mapping between the color values from minimum distance to maximum distance as the histogram colorization does. Now they are aligned.
+    #colors = cmap(np.minimum(distances, max_distance) / max_distance)[:, :3] # This is 
+    # the original line that I replaced below. I replaced it because the above line does 
+    # not give a linear mapping between the color values from minimum distance to maximum 
+    # distance as the histogram colorization does. Now they are aligned.
     max_dist = 0.05
     # c = distances/np.amax(distances.flatten())
     c = distances/max_dist
@@ -109,8 +111,7 @@ def write_color_distances_mesh(path, mesh, distances, max_distance):
 
 
 # Note that this method contained a cropping part that cropped out the points
-# that lay within the bounding box of the ground truth point cloud. This is not 
-# necessary for me now when I used meshed reconstructions. NOW I INCLUDED IT AGAIN!
+# that lay within the bounding box of the ground truth point cloud.
 def EvaluateHisto(
     source,
     source_mesh,
@@ -134,7 +135,8 @@ def EvaluateHisto(
     print('source points before downsampling: ', np.asarray(s.points).shape)
     # s = s.voxel_down_sample(voxel_size)
     print('source points after downsampling: ', np.asarray(s.points).shape)
-    # s.estimate_normals(search_param=o3d.geometry.KDTreeSearchParamKNN(knn=20))
+    # s.estimate_normals(search_param=o3d.geometry.KDTreeSearchParamKNN(knn=20)) # normal
+    # estimation sometimes cause color artifacts
     print(filename_mvs + "/" + scene_name + ".precision.ply")
 
     t = copy.deepcopy(target)
@@ -193,8 +195,6 @@ def EvaluateHisto(
     plt.grid(True)
     plt.savefig(filename_mvs + "/" + 'histogram_gt_to_rec')
     
-
-
     # write the distances to bin files
     # np.array(distance1).astype("float64").tofile(
     #     filename_mvs + "/" + scene_name + ".precision.bin"

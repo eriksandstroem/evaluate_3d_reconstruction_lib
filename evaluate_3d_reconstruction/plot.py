@@ -1,3 +1,5 @@
+# This script is modified from the original source by Erik Sandstroem
+
 # ----------------------------------------------------------------------------
 # -                   TanksAndTemples Website Toolbox                        -
 # -                    http://www.tanksandtemples.org                        -
