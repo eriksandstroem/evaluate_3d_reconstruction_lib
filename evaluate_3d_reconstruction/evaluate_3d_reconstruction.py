@@ -56,6 +56,8 @@ def run_evaluation(pred_ply, path_to_pred_ply, scene, transformation=None):
         scene: string object to denote the scene name (a corresponding ground 
                     truth .ply file with the name "scene + .ply" needs to exist)
         path_to_pred_ply: string object to denote the full path to the pred_ply file
+        transformation: boolean to denote if to use the available transformation matrix for
+                    the ground truth mesh.
 
     Returns:
         None
@@ -171,18 +173,15 @@ if __name__ == "__main__":
 
 
     pred_ply = argv[1] # name of predicted .ply file
-    ground_truth_data = argv[2] # watertight or artificial_trunc or standard_trunc 
-    scene = argv[3] # scene name
-    if len(argv) == 5:
-        transformation= argv[4] # transformation matrix to be applied if the meshes are not aligned
+    scene = argv[2] # scene name
+    if len(argv) == 4:
+        transformation= argv[3] # transformation matrix to be applied if the meshes are not aligned
     else:
         transformation=None
 
     run_evaluation(
         pred_ply=pred_ply,
-        ground_truth_data=ground_truth_data,
-        scene=scene,
         path_to_pred_ply=str(pathlib.Path().absolute()),
+        scene=scene,
         transformation=transformation
-
     )
