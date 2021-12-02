@@ -4,7 +4,7 @@ This is an modified version of the F-score evaluation of 3D meshes provided by [
 
 For improved evaluation accuracy, this version does not crop or downsample the meshes and not automatic alignment is produced since the predicted and reference meshes are assumed to be aligned.
 
-### Prerequisites TEST CHANGE
+### Prerequisites
 The library has been tested with the following dependencies
 
 1. Python 3.8.5
