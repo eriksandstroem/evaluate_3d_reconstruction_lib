@@ -127,3 +127,11 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+evaluate_3d_reconstruction/data/transformation_matrices/hotel_0/hotel_0_open3d_pad_2.mat.txt
+evaluate_3d_reconstruction/data/transformation_matrices/office_0/office_0_open3d_pad_0_old.mat.txt
+evaluate_3d_reconstruction/data/transformation_matrices/office_0/office_0_open3d_pad_0.mat.txt
+evaluate_3d_reconstruction/data/transformation_matrices/office_0/office_0_open3d_pad_2_on_gt_depth_rec.mat.txt
+evaluate_3d_reconstruction/data/transformation_matrices/office_0/office_0_open3d_pad_2.mat.txt
+evaluate_3d_reconstruction/data/transformation_matrices/office_0/voxblox_office_0_transform_no_refine.mat.txt
+evaluate_3d_reconstruction/data/transformation_matrices/office_0/voxblox_office_0_transform.mat.txt
+evaluate_3d_reconstruction/data/transformation_matrices/office_4/office_4_open3d_pad_2.mat.txt
