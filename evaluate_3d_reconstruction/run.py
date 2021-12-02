@@ -1,13 +1,19 @@
 # Legacy script - not used anymore
 import os
-import numpy as np
-path = '/home/esandstroem/scratch-second/opportunistic_3d_capture/Erik_3D_Reconstruction_Project/src/RoutedFusion/workspace/fusion/multidepth_routingNet/test/'
+
+path = "/home/esandstroem/scratch-second/opportunistic_3d_capture/Erik_3D_Reconstruction_Project/src/RoutedFusion/workspace/fusion/multidepth_routingNet/test/"
 os.chdir(path)
 for scene_id in os.listdir(path):
-	if scene_id.startswith('mesh'):
-		print('running script: evaluate_3d_reconstruction.py ' + scene_id + ' watertight routedfusion')
-		os.system('evaluate_3d_reconstruction.py ' + scene_id + ' watertight routedfusion')
-	# break
+    if scene_id.startswith("mesh"):
+        print(
+            "running script: evaluate_3d_reconstruction.py "
+            + scene_id
+            + " watertight routedfusion"
+        )
+        os.system(
+            "evaluate_3d_reconstruction.py " + scene_id + " watertight routedfusion"
+        )
+    # break
 
 
 # path = '/home/esandstroem/scratch-second/opportunistic_3d_capture/Erik_3D_Reconstruction_Project/3rdparty/evaluate_3d_reconstruction/data/replica/office_0/routedfusion/tof_watertight/'
@@ -22,7 +28,7 @@ for scene_id in os.listdir(path):
 # 	col = int(scene_id[-4])
 # 	col2 = scene_id[-5]
 # 	if col2.isdigit():
-# 		col = int(scene_id[-5:-3]) 
+# 		col = int(scene_id[-5:-3])
 # 	# print(col)
 # 	file = path + scene_id + '/office_0.prf_tau_plotstr.txt'
 # 	# open file

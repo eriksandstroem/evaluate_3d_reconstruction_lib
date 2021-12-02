@@ -39,10 +39,11 @@
 import matplotlib.pyplot as plt
 from cycler import cycler
 from matplotlib import rc
-rc('font',**{'family':'serif','sans-serif':['Times New Roman']})
-## for Palatino and other serif fonts use:
-#rc('font',**{'family':'serif','serif':['Palatino']})
-rc('text', usetex=True)
+
+rc("font", **{"family": "serif", "sans-serif": ["Times New Roman"]})
+# for Palatino and other serif fonts use:
+# rc('font',**{'family':'serif','serif':['Palatino']})
+rc("text", usetex=True)
 
 
 def plot_graph(
@@ -99,7 +100,7 @@ def plot_graph(
 
     plt.legend(loc=2, borderaxespad=0.0, fontsize=pfontsize)
     plt.legend(loc=4)
-    leg = plt.legend(loc="lower right")
+    plt.legend(loc="lower right")
 
     box = ax.get_position()
     ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])

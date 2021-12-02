@@ -36,15 +36,16 @@
 # The dataset has a different license, please refer to
 # https://tanksandtemples.org/license/
 
-# This script has been modified by Erik Sandstroem. 
+# This script has been modified by Erik Sandstroem.
 # The code is not used by the current library as we do not need
 # to align the meshes, but are left in case this is needed
 # in the future.
 
-from trajectory_io import read_trajectory, convert_trajectory_to_pointcloud
+from trajectory_io import convert_trajectory_to_pointcloud
 import copy
 import numpy as np
 import open3d as o3d
+
 MAX_POINT_NUMBER = 4e6
 
 
@@ -71,9 +72,13 @@ def gen_sparse_trajectory(mapping, f_trajectory):
 
 def trajectory_alignment(
     map_file, traj_to_register, gt_traj_col, gt_trans, scene
-): # the scene data is not used
-    traj_pcd_col = convert_trajectory_to_pointcloud(gt_traj_col) # this creates a point in 3D for each camera center.
-    traj_pcd_col.transform(gt_trans) # this applies the transformation to this point cloud
+):  # the scene data is not used
+    traj_pcd_col = convert_trajectory_to_pointcloud(
+        gt_traj_col
+    )  # this creates a point in 3D for each camera center.
+    traj_pcd_col.transform(
+        gt_trans
+    )  # this applies the transformation to this point cloud
     corres = o3d.utility.Vector2iVector(
         np.asarray(list(map(lambda x: [x, x], range(len(gt_traj_col)))))
     )
@@ -88,13 +93,11 @@ def trajectory_alignment(
         # The map_file is not even used if the number of camera poses don't exceed 1600. I have 400
         # For now, I don't need to care about it. According to the tutorial, this is only central for video
         # reconstruction
-        n_sampled_frames, n_total_frames, mapping = read_mapping(map_file)
+        _, _, mapping = read_mapping(map_file)
         traj_col2 = gen_sparse_trajectory(mapping, traj_to_register)
         traj_to_register_pcd = convert_trajectory_to_pointcloud(traj_col2)
     else:
-        traj_to_register_pcd = convert_trajectory_to_pointcloud(
-            traj_to_register
-        )
+        traj_to_register_pcd = convert_trajectory_to_pointcloud(traj_to_register)
 
     randomvar = 0.0
     nr_of_cam_pos = len(traj_to_register_pcd.points)
@@ -128,9 +131,9 @@ def trajectory_alignment(
 
 
 # This function is called "crop_and_downsample" because it used to also crop out the
-# point cloud that was only true to the bounding box of the ground truth point cloud, 
-# but since I am not working on non-meshed colmap, this is not a problem so I removed the 
-# cropping. The name remains to remind me that I can add cropping here at some point. 
+# point cloud that was only true to the bounding box of the ground truth point cloud,
+# but since I am not working on non-meshed colmap, this is not a problem so I removed the
+# cropping. The name remains to remind me that I can add cropping here at some point.
 # Check the tanks and temples original code for this. I can use the cropping function
 # open3d.geometry.crop_point_cloud(input, min_bound, max_bound). NOW I INCLUDED IT AGAIN!
 def crop_and_downsample(
@@ -145,7 +148,7 @@ def crop_and_downsample(
 
     aabb = target_pcd.get_axis_aligned_bounding_box()
     # aabb.color = (1,0,0)
-    obb = target_pcd.get_oriented_bounding_box()
+    # obb = target_pcd.get_oriented_bounding_box()
     # obb.color = (0, 1,0)
     pcd_crop = pcd_copy.crop(aabb)
     # o3d.visualization.draw_geometries([pcd_crop, aabb, obb])
@@ -179,7 +182,7 @@ def registration_unif(
     init_trans,
     threshold,
     max_itr,
-    max_size=4 * MAX_POINT_NUMBER, # this is not used
+    max_size=4 * MAX_POINT_NUMBER,  # this is not used
     verbose=True,
 ):
     if verbose:
@@ -213,10 +216,7 @@ def registration_vol_ds(
     verbose=True,
 ):
     if verbose:
-        print(
-            "[Registration] voxel_size: %f, threshold: %f"
-            % (voxel_size, threshold)
-        )
+        print("[Registration] voxel_size: %f, threshold: %f" % (voxel_size, threshold))
         o3d.utility.set_verbosity_level(o3d.utility.VerbosityLevel.Debug)
     s = crop_and_downsample(
         source,

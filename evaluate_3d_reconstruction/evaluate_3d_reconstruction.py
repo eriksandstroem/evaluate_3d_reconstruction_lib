@@ -1,5 +1,4 @@
 #!/cluster/project/cvl/esandstroem/virtual_envs/multisensor_env_python_gpu_3.8.5/bin/python
-import os
 
 # This script is modified from the original source by Erik Sandstroem
 
@@ -41,10 +40,14 @@ import open3d as o3d
 from sys import argv
 import pathlib
 
-from evaluate_3d_reconstruction.config import *
+from evaluate_3d_reconstruction.config import (
+    ground_truth_data_base,
+    base_transformation_dir,
+)
 from evaluate_3d_reconstruction.evaluation import EvaluateHisto
 from evaluate_3d_reconstruction.util import make_dir
 from evaluate_3d_reconstruction.plot import plot_graph
+
 
 def run_evaluation(pred_ply, path_to_pred_ply, scene, transformation=None):
     """
@@ -53,7 +56,7 @@ def run_evaluation(pred_ply, path_to_pred_ply, scene, transformation=None):
 
     Args:
         pred_ply: string object to denote the name of predicted mesh (as a .ply file)
-        scene: string object to denote the scene name (a corresponding ground 
+        scene: string object to denote the scene name (a corresponding ground
                     truth .ply file with the name "scene + .ply" needs to exist)
         path_to_pred_ply: string object to denote the full path to the pred_ply file
         transformation: boolean to denote if to use the available transformation matrix for
@@ -65,18 +68,20 @@ def run_evaluation(pred_ply, path_to_pred_ply, scene, transformation=None):
 
     # load transformation matrix
     if transformation:
-        gt_trans = np.loadtxt(base_transformation_dir + '/' + scene + '/' + transformation)
+        gt_trans = np.loadtxt(
+            base_transformation_dir + "/" + scene + "/" + transformation
+        )
     else:
         gt_trans = np.eye(4)
 
     # specify path to ground truth mesh
-    gt_ply_path = ground_truth_data_base + '/' + scene + '.ply' 
+    gt_ply_path = ground_truth_data_base + "/" + scene + ".ply"
 
     # full path to predicted mesh
-    pred_ply_path = path_to_pred_ply + '/' + pred_ply
+    pred_ply_path = path_to_pred_ply + "/" + pred_ply
 
     # output directory
-    out_dir = path_to_pred_ply + '/' + pred_ply[:-4]
+    out_dir = path_to_pred_ply + "/" + pred_ply[:-4]
 
     # create output directory
     make_dir(out_dir)
@@ -86,14 +91,20 @@ def run_evaluation(pred_ply, path_to_pred_ply, scene, transformation=None):
     print("Evaluating %s" % scene)
     print("===========================")
 
-    dTau = 0.02 # constant Tau regardless of scene size
+    dTau = 0.02  # constant Tau regardless of scene size
 
     # Load reconstruction and corresponding GT
-    pcd = o3d.io.read_point_cloud(pred_ply_path) # samples the vertex coordinate points of the mesh
-    mesh = o3d.io.read_triangle_mesh(pred_ply_path) # mesh which we want to color for precision
+    pcd = o3d.io.read_point_cloud(
+        pred_ply_path
+    )  # samples the vertex coordinate points of the mesh
+    mesh = o3d.io.read_triangle_mesh(
+        pred_ply_path
+    )  # mesh which we want to color for precision
 
     gt_pcd = o3d.io.read_point_cloud(gt_ply_path)
-    gt_mesh = o3d.io.read_triangle_mesh(gt_ply_path) # mesh which we want to color for recall
+    gt_mesh = o3d.io.read_triangle_mesh(
+        gt_ply_path
+    )  # mesh which we want to color for recall
 
     dist_threshold = dTau
     voxel_size = 0.01
@@ -154,7 +165,6 @@ def run_evaluation(pred_ply, path_to_pred_ply, scene, transformation=None):
     print("std: %.4f" % std2)
     print("==============================")
 
-
     # Plotting
     plot_graph(
         scene,
@@ -171,17 +181,18 @@ def run_evaluation(pred_ply, path_to_pred_ply, scene, transformation=None):
 
 if __name__ == "__main__":
 
-
-    pred_ply = argv[1] # name of predicted .ply file
-    scene = argv[2] # scene name
+    pred_ply = argv[1]  # name of predicted .ply file
+    scene = argv[2]  # scene name
     if len(argv) == 4:
-        transformation= argv[3] # transformation matrix to be applied if the meshes are not aligned
+        transformation = argv[
+            3
+        ]  # transformation matrix to be applied if the meshes are not aligned
     else:
-        transformation=None
+        transformation = None
 
     run_evaluation(
         pred_ply=pred_ply,
         path_to_pred_ply=str(pathlib.Path().absolute()),
         scene=scene,
-        transformation=transformation
+        transformation=transformation,
     )

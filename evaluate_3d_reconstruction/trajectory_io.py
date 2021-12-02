@@ -45,9 +45,5 @@ def write_trajectory(traj, filename):
         for x in traj:
             p = x.pose.tolist()
             f.write(" ".join(map(str, x.metadata)) + "\n")
-            f.write(
-                "\n".join(
-                    " ".join(map("{0:.12f}".format, p[i])) for i in range(4)
-                )
-            )
+            f.write("\n".join(" ".join(map("{0:.12f}".format, p[i])) for i in range(4)))
             f.write("\n")
