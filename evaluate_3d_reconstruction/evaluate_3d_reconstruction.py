@@ -50,21 +50,19 @@ from evaluate_3d_reconstruction.plot import plot_graph
 
 
 def run_evaluation(pred_ply, path_to_pred_ply, scene, transformation=None):
-    """
-    Calculates the F-score from a predicted mesh to a reference mesh. Generates
+    """Calculates the F-score from a predicted mesh to a reference mesh. Generates
     a directory and fills this numerical and mesh results.
 
-    Args:
-        pred_ply: string object to denote the name of predicted mesh (as a .ply file)
-        scene: string object to denote the scene name (a corresponding ground
-                    truth .ply file with the name "scene + .ply" needs to exist)
-        path_to_pred_ply: string object to denote the full path to the pred_ply file
-        transformation: boolean to denote if to use the available transformation matrix for
-                    the ground truth mesh.
+        Args:
+            pred_ply: string object to denote the name of predicted mesh (as a .ply file)
+            scene: string object to denote the scene name (a corresponding ground
+                        truth .ply file with the name "scene + .ply" needs to exist)
+            path_to_pred_ply: string object to denote the full path to the pred_ply file
+            transformation: boolean to denote if to use the available transformation matrix for
+                        the ground truth mesh.
 
-    Returns:
-        None
-    """
+        Returns:
+            None"""
 
     # load transformation matrix
     if transformation:
