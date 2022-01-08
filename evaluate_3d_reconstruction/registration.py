@@ -36,7 +36,6 @@
 # The dataset has a different license, please refer to
 # https://tanksandtemples.org/license/
 
-# This script has been modified by Erik Sandstroem.
 # The code is not used by the current library as we do not need
 # to align the meshes, but are left in case this is needed
 # in the future.
