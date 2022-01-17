@@ -120,3 +120,5 @@ def plot_graph(
     f.savefig(pdf_name, format="pdf", bbox_inches="tight")
     if show_figure:
         plt.show()
+
+    plt.clf()  # important to clear plot
