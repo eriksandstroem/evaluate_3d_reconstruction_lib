@@ -45,7 +45,7 @@ matplotlib.use("Agg")
 rc("font", **{"family": "serif", "sans-serif": ["Times New Roman"]})
 # for Palatino and other serif fonts use:
 # rc('font',**{'family':'serif','serif':['Palatino']})
-rc("text", usetex=True)
+rc("text", usetex=True)  # if Latex is installed and executable on PATH
 
 
 def read_alignment_transformation(filename):
