@@ -41,111 +41,43 @@ import matplotlib
 
 matplotlib.use("Agg")
 
-
 rc("font", **{"family": "serif", "sans-serif": ["Times New Roman"]})
-# for Palatino and other serif fonts use:
-# rc('font',**{'family':'serif','serif':['Palatino']})
 rc("text", usetex=True)  # if Latex is installed and executable on PATH
-
-
-def read_alignment_transformation(filename):
-    with open(filename) as data_file:
-        data = json.load(data_file)
-    return np.asarray(data["transformation"]).reshape((4, 4)).transpose()
-
-
-def write_color_distances_pcd(path, pcd, distances, max_distance):
-    o3d.utility.set_verbosity_level(o3d.utility.VerbosityLevel.Debug)
-    # cmap = plt.get_cmap("afmhot")
-    # cmap = plt.get_cmap("hot_r")
-    # cmap = plt.get_cmap("winter")
-    cmap = plt.get_cmap("hsv")
-    distances = np.array(distances)
-    # colors = cmap(np.minimum(distances, max_distance) / max_distance)[:, :3] # This is
-    # the original line that I replaced below. I replaced it because the above line does
-    # not give a linear mapping between the color values from minimum distance to maximum
-    # distance as the histogram colorization does. Now they are aligned.
-    max_dist = 0.05
-    # c = distances/np.amax(distances.flatten())
-    c = distances / max_dist
-    c[c > 0.85] = 0.85
-    c += 0.33
-    c[c > 1] = c[c > 1] - 1
-    # for i in range(len(c)):
-    #     if c[i] > 0.85:
-    #         c[i] = 0.85
-    #     c += 0.33
-    #     if c[i] > 1:
-    #         c[i] -= 1
-
-    colors = cmap(c)[:, :3]
-    pcd.colors = o3d.utility.Vector3dVector(colors)
-    o3d.io.write_point_cloud(path, pcd)
 
 
 def write_color_distances_mesh(path, mesh, distances, max_distance):
     o3d.utility.set_verbosity_level(o3d.utility.VerbosityLevel.Debug)
-    # cmap = plt.get_cmap("afmhot")
-    # cmap = plt.get_cmap("hot_r")
-    # cmap = plt.get_cmap("winter")
+
     cmap = plt.get_cmap("hsv")
     distances = np.array(distances)
-    # colors = cmap(np.minimum(distances, max_distance) / max_distance)[:, :3] # This is
-    # the original line that I replaced below. I replaced it because the above line does
-    # not give a linear mapping between the color values from minimum distance to maximum
-    # distance as the histogram colorization does. Now they are aligned.
-    max_dist = 0.05
-    # c = distances/np.amax(distances.flatten())
+
+    max_dist = max_distance
     c = distances / max_dist
     c[c > 0.85] = 0.85
     c += 0.33
     c[c > 1] = c[c > 1] - 1
-    # for i in range(len(c)):
-    #     if c[i] > 0.85:
-    #         c[i] = 0.85
-    #     c += 0.33
-    #     if c[i] > 1:
-    #         c[i] -= 1
 
     colors = cmap(c)[:, :3]
     mesh.vertex_colors = o3d.utility.Vector3dVector(colors)
     o3d.io.write_triangle_mesh(path, mesh)
 
 
-# Note that this method contained a cropping part that cropped out the points
-# that lay within the bounding box of the ground truth point cloud.
 def EvaluateHisto(
     source,
     source_mesh,
     target,
     target_mesh,
-    trans,
-    voxel_size,
     threshold,
     filename_mvs,
     plot_stretch,
     scene_name,
-    verbose=True,
 ):
     print("[EvaluateHisto]")
-    o3d.utility.set_verbosity_level(o3d.utility.VerbosityLevel.Debug)
     s = copy.deepcopy(source)
-    s.transform(trans)
-    # aabb = target.get_axis_aligned_bounding_box()
-    # s = s.crop(aabb)
 
-    print("source points before downsampling: ", np.asarray(s.points).shape)
-    # s = s.voxel_down_sample(voxel_size)
-    print("source points after downsampling: ", np.asarray(s.points).shape)
-    # s.estimate_normals(search_param=o3d.geometry.KDTreeSearchParamKNN(knn=20)) # normal
-    # estimation sometimes cause color artifacts
     print(filename_mvs + "/" + scene_name + ".precision.ply")
 
     t = copy.deepcopy(target)
-    print("target points before downsampling: ", np.asarray(t.points).shape)
-    # t = t.voxel_down_sample(voxel_size)
-    print("target points after downsampling: ", np.asarray(t.points).shape)
-    # t.estimate_normals(search_param=o3d.geometry.KDTreeSearchParamKNN(knn=20))
     print("[compute_point_cloud_to_point_cloud_distance]")
     distance1 = s.compute_point_cloud_distance(t)  # distance from source to target
     print("[compute_point_cloud_to_point_cloud_distance]")
@@ -155,13 +87,11 @@ def EvaluateHisto(
     cm = plt.get_cmap("hsv")
     _, bins, patches = plt.hist(distance1, bins=1000)
     bin_centers = 0.5 * (bins[:-1] + bins[1:])
-    # print(len(bin_centers))
 
     # scale values to interval [0,1]
-    # print(min(bin_centers))
-    max_col = 0.05
+    max_col = threshold
     col = bin_centers - min(bin_centers)
-    # col /= max(col)
+
     col /= max_col
     for c, p in zip(col, patches):
         if c > 0.85:
@@ -197,49 +127,14 @@ def EvaluateHisto(
     plt.grid(True)
     plt.savefig(filename_mvs + "/" + "histogram_gt_to_rec")
 
-    # write the distances to bin files
-    # np.array(distance1).astype("float64").tofile(
-    #     filename_mvs + "/" + scene_name + ".precision.bin"
-    # )
-    # np.array(distance2).astype("float64").tofile(
-    #     filename_mvs + "/" + scene_name + ".recall.bin"
-    # )
-
-    # Colorize the poincloud files prith the precision and recall values
-    # o3d.io.write_point_cloud(
-    #     filename_mvs + "/" + scene_name + ".precision.ply", s
-    # )
-    # o3d.io.write_point_cloud(
-    #     filename_mvs + "/" + scene_name + ".precision.ncb.ply", s
-    # )
-    # o3d.io.write_point_cloud(filename_mvs + "/" + scene_name + ".recall.ply", t)
-
     source_n_fn = filename_mvs + "/" + scene_name + ".precision.ply"
     target_n_fn = filename_mvs + "/" + scene_name + ".recall.ply"
 
     print("[ViewDistances] Add color coding to visualize error")
-    # eval_str_viewDT = (
-    #     OPEN3D_EXPERIMENTAL_BIN_PATH
-    #     + "ViewDistances "
-    #     + source_n_fn
-    #     + " --max_distance "
-    #     + str(threshold * 3)
-    #     + " --write_color_back --without_gui"
-    # )
-    # os.system(eval_str_viewDT)
-    write_color_distances_mesh(source_n_fn, source_mesh, distance1, 3 * threshold)
+    write_color_distances_mesh(source_n_fn, source_mesh, distance1, threshold)
 
     print("[ViewDistances] Add color coding to visualize error")
-    # eval_str_viewDT = (
-    #     OPEN3D_EXPERIMENTAL_BIN_PATH
-    #     + "ViewDistances "
-    #     + target_n_fn
-    #     + " --max_distance "
-    #     + str(threshold * 3)
-    #     + " --write_color_back --without_gui"
-    # )
-    # os.system(eval_str_viewDT)
-    write_color_distances_mesh(target_n_fn, target_mesh, distance2, 3 * threshold)
+    write_color_distances_mesh(target_n_fn, target_mesh, distance2, threshold)
 
     # get histogram and f-score
     [
@@ -250,7 +145,7 @@ def EvaluateHisto(
         cum_source,
         edges_target,
         cum_target,
-    ] = get_f1_score_histo2(threshold, filename_mvs, plot_stretch, distance1, distance2)
+    ] = get_f1_score_histo(threshold, filename_mvs, plot_stretch, distance1, distance2)
     np.savetxt(filename_mvs + "/" + scene_name + ".recall.txt", cum_target)
     np.savetxt(filename_mvs + "/" + scene_name + ".precision.txt", cum_source)
     np.savetxt(
@@ -294,10 +189,8 @@ def EvaluateHisto(
     ]
 
 
-def get_f1_score_histo2(
-    threshold, filename_mvs, plot_stretch, distance1, distance2, verbose=True
-):
-    print("[get_f1_score_histo2]")
+def get_f1_score_histo(threshold, filename_mvs, plot_stretch, distance1, distance2):
+    print("[get_f1_score_histo]")
     dist_threshold = threshold
     if len(distance1) and len(distance2):
 

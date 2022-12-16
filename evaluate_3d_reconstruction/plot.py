@@ -41,8 +41,6 @@ from cycler import cycler
 from matplotlib import rc
 
 rc("font", **{"family": "serif", "sans-serif": ["Times New Roman"]})
-# for Palatino and other serif fonts use:
-# rc('font',**{'family':'serif','serif':['Palatino']})
 rc("text", usetex=True)
 
 
@@ -84,17 +82,13 @@ def plot_graph(
     ax.grid(True)
     plt.rcParams["figure.figsize"] = plt_size
     plt.rc("axes", prop_cycle=cycler("color", ["r", "g", "b", "y"]))
-    # rc('text', usetex=False)
-    # title = str("Precision and Recall: " + scene + ", " + "%02.2f f-score" % (fscore * 100))
-    # plt.title(title)
-    # rc('text', usetex=True)
+
     plt.axvline(x=dist_threshold, c="black", ls="dashed", linewidth=2.0)
 
     plt.ylabel("$\#$ of points ($\%$)", fontsize=10)
     plt.xlabel("Meters", fontsize=10)
     plt.axis([0, dist_threshold * plot_stretch, 0, 100])
     ax.legend(shadow=True, fancybox=True, fontsize=pfontsize)
-    # plt.axis([0, dist_threshold*plot_stretch, 0, 100])
 
     plt.setp(ax.get_legend().get_texts(), fontsize=pfontsize)
 

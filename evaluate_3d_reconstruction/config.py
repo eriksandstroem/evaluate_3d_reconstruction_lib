@@ -32,9 +32,6 @@
 # ----------------------------------------------------------------------------
 
 # declare global variables
-
 ground_truth_data_base = (
-    "/cluster/work/cvl/esandstroem/data/ground_truth_data/standard_truncation_0.1"
+    "/cluster/work/cvl/esandstroem/data/ground_truth_data/gt_mesh_poisson"
 )
-
-base_transformation_dir = "/cluster/project/cvl/esandstroem/3rdparty/evaluate_3d_reconstruction/data/transformation_matrices"

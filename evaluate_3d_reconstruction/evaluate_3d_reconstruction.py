@@ -42,35 +42,34 @@ import pathlib
 
 from evaluate_3d_reconstruction.config import (
     ground_truth_data_base,
-    base_transformation_dir,
 )
 from evaluate_3d_reconstruction.evaluation import EvaluateHisto
 from evaluate_3d_reconstruction.util import make_dir
 from evaluate_3d_reconstruction.plot import plot_graph
 
 
-def run_evaluation(pred_ply, path_to_pred_ply, scene, transformation=None):
+def run_evaluation(
+    pred_ply,
+    path_to_pred_ply,
+    scene,
+    distance_thresh=0.10,
+    gt_translate_to_zero=False,
+    pred_translate_to_zero=False,
+):
     """Calculates the F-score from a predicted mesh to a reference mesh. Generates
-    a directory and fills this numerical and mesh results.
+    a directory and fills this with numerical and mesh results.
 
         Args:
-            pred_ply: string object to denote the name of predicted mesh (as a .ply file)
-            scene: string object to denote the scene name (a corresponding ground
-                        truth .ply file with the name "scene + .ply" needs to exist)
-            path_to_pred_ply: string object to denote the full path to the pred_ply file
-            transformation: boolean to denote if to use the available transformation matrix for
-                        the ground truth mesh.
+            pred_ply (string): string object to denote the name of predicted mesh (as a .ply file)
+            path_to_pred_ply (string): string object to denote the full path to the pred_ply file
+            scene (string): string object to denote the scene name (a corresponding ground truth .ply file with the name "scene + .ply" needs to exist)
+            distance_threshold (float):
+            gt_translate_to_zero (bool): boolean describing whether to transform gt to origin
+            pred_translate_to_zero (bool): boolean describing whether to transform prediction to origin
 
         Returns:
-            None"""
-
-    # load transformation matrix
-    if transformation:
-        gt_trans = np.loadtxt(
-            base_transformation_dir + "/" + scene + "/" + transformation
-        )
-    else:
-        gt_trans = np.eye(4)
+            None
+    """
 
     # specify path to ground truth mesh
     gt_ply_path = ground_truth_data_base + "/" + scene + ".ply"
@@ -89,23 +88,39 @@ def run_evaluation(pred_ply, path_to_pred_ply, scene, transformation=None):
     print("Evaluating %s" % scene)
     print("===========================")
 
-    dTau = 0.02  # constant Tau regardless of scene size
+    dTau = distance_thresh  # constant Tau regardless of scene size
 
     # Load reconstruction and corresponding GT
     pcd = o3d.io.read_point_cloud(
         pred_ply_path
     )  # samples the vertex coordinate points of the mesh
+
     mesh = o3d.io.read_triangle_mesh(
         pred_ply_path
     )  # mesh which we want to color for precision
+    if pred_translate_to_zero:
+        pcd.points = o3d.utility.Vector3dVector(
+            np.array(pcd.points) - np.array(pcd.points).min(axis=0)
+        )
+        mesh.vertices = o3d.utility.Vector3dVector(
+            np.array(mesh.vertices) - np.array(mesh.vertices).min(axis=0)
+        )
 
     gt_pcd = o3d.io.read_point_cloud(gt_ply_path)
+
     gt_mesh = o3d.io.read_triangle_mesh(
         gt_ply_path
     )  # mesh which we want to color for recall
 
+    if gt_translate_to_zero:
+        gt_pcd.points = o3d.utility.Vector3dVector(
+            np.array(gt_pcd.points) - np.array(gt_pcd.points).min(axis=0)
+        )
+        gt_mesh.vertices = o3d.utility.Vector3dVector(
+            np.array(gt_mesh.vertices) - np.array(gt_mesh.vertices).min(axis=0)
+        )
+
     dist_threshold = dTau
-    voxel_size = 0.01
 
     # Histograms and P/R/F
     plot_stretch = 5
@@ -132,8 +147,6 @@ def run_evaluation(pred_ply, path_to_pred_ply, scene, transformation=None):
         mesh,
         gt_pcd,
         gt_mesh,
-        gt_trans,
-        voxel_size,
         dTau,
         out_dir,
         plot_stretch,
@@ -181,16 +194,9 @@ if __name__ == "__main__":
 
     pred_ply = argv[1]  # name of predicted .ply file
     scene = argv[2]  # scene name
-    if len(argv) == 4:
-        transformation = argv[
-            3
-        ]  # transformation matrix to be applied if the meshes are not aligned
-    else:
-        transformation = None
 
     run_evaluation(
         pred_ply=pred_ply,
         path_to_pred_ply=str(pathlib.Path().absolute()),
         scene=scene,
-        transformation=transformation,
     )
