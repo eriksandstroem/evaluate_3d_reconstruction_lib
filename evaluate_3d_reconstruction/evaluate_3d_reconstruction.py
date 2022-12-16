@@ -91,33 +91,33 @@ def run_evaluation(
     dTau = distance_thresh  # constant Tau regardless of scene size
 
     # Load reconstruction and corresponding GT
-    pcd = o3d.io.read_point_cloud(
-        pred_ply_path
-    )  # samples the vertex coordinate points of the mesh
-
     mesh = o3d.io.read_triangle_mesh(
         pred_ply_path
     )  # mesh which we want to color for precision
     if pred_translate_to_zero:
-        pcd.points = o3d.utility.Vector3dVector(
-            np.array(pcd.points) - np.array(pcd.points).min(axis=0)
-        )
         mesh.vertices = o3d.utility.Vector3dVector(
             np.array(mesh.vertices) - np.array(mesh.vertices).min(axis=0)
         )
-
-    gt_pcd = o3d.io.read_point_cloud(gt_ply_path)
 
     gt_mesh = o3d.io.read_triangle_mesh(
         gt_ply_path
     )  # mesh which we want to color for recall
 
     if gt_translate_to_zero:
-        gt_pcd.points = o3d.utility.Vector3dVector(
-            np.array(gt_pcd.points) - np.array(gt_pcd.points).min(axis=0)
-        )
         gt_mesh.vertices = o3d.utility.Vector3dVector(
             np.array(gt_mesh.vertices) - np.array(gt_mesh.vertices).min(axis=0)
+        )
+
+    # sample points on surface. Make sure that we have equal sample density from both meshes. Sample the amount of points equaling the number of vertices from the mesh with fewest vertices.
+    if np.array(gt_mesh.vertices).shape[0] > np.array(mesh.vertices).shape[0]:
+        gt_pcd = gt_mesh.sample_points_uniformly(
+            number_of_points=np.array(mesh.vertices).shape[0]
+        )
+        pcd = o3d.io.read_point_cloud(pred_ply_path)
+    else:
+        gt_pcd = o3d.io.read_point_cloud(gt_ply_path)
+        pcd = mesh.sample_points_uniformly(
+            number_of_points=np.array(gt_mesh.vertices).shape[0]
         )
 
     dist_threshold = dTau

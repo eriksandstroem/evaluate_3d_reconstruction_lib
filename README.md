@@ -1,6 +1,6 @@
 # Evaluate F-score
 
-This is an modified version of the F-score evaluation of 3D meshes provided by [**Thanks and Temples**](https://github.com/isl-org/TanksAndTemples/tree/master/python_toolbox/evaluation). 
+This is a modified version of the F-score evaluation of 3D meshes provided by [**Thanks and Temples**](https://github.com/isl-org/TanksAndTemples/tree/master/python_toolbox/evaluation). 
 
 For improved evaluation realism, this version does not crop or downsample the meshes and assumes that the predicted and target meshes are already aligned.
 
