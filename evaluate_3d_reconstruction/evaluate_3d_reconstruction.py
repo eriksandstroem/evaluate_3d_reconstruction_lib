@@ -39,10 +39,9 @@ import numpy as np
 import open3d as o3d
 from sys import argv
 import pathlib
+import trimesh
 
-from evaluate_3d_reconstruction.config import (
-    ground_truth_data_base,
-)
+from evaluate_3d_reconstruction.config import ground_truth_data_base
 from evaluate_3d_reconstruction.evaluation import EvaluateHisto
 from evaluate_3d_reconstruction.util import make_dir
 from evaluate_3d_reconstruction.plot import plot_graph
@@ -90,35 +89,59 @@ def run_evaluation(
 
     dTau = distance_thresh  # constant Tau regardless of scene size
 
+    # dictionary to store input to evaluation function
+    geometric_dict = dict()
+
     # Load reconstruction and corresponding GT
-    mesh = o3d.io.read_triangle_mesh(
-        pred_ply_path
+    # Using trimesh to load because sometimes open3d fails loading .ply files
+    mesh = trimesh.load(pred_ply_path)
+    mesh = o3d.geometry.TriangleMesh(
+        vertices=o3d.utility.Vector3dVector(mesh.vertices),
+        triangles=o3d.utility.Vector3iVector(mesh.faces),
     )  # mesh which we want to color for precision
+    geometric_dict["mesh"] = mesh
+
     if pred_translate_to_zero:
         mesh.vertices = o3d.utility.Vector3dVector(
             np.array(mesh.vertices) - np.array(mesh.vertices).min(axis=0)
         )
 
-    gt_mesh = o3d.io.read_triangle_mesh(
-        gt_ply_path
+    gt_mesh = trimesh.load(gt_ply_path)
+    gt_mesh = o3d.geometry.TriangleMesh(
+        vertices=o3d.utility.Vector3dVector(gt_mesh.vertices),
+        triangles=o3d.utility.Vector3iVector(gt_mesh.faces),
     )  # mesh which we want to color for recall
+    geometric_dict["gt_mesh"] = gt_mesh
 
     if gt_translate_to_zero:
         gt_mesh.vertices = o3d.utility.Vector3dVector(
             np.array(gt_mesh.vertices) - np.array(gt_mesh.vertices).min(axis=0)
         )
 
-    # sample points on surface. Make sure that we have equal sample density from both meshes. Sample the amount of points equaling the number of vertices from the mesh with fewest vertices.
-    if np.array(gt_mesh.vertices).shape[0] > np.array(mesh.vertices).shape[0]:
+    # sample points on surface. Make sure that we have equal sample density from both meshes.
+    # Sample the amount of points equaling the number of vertices from the mesh with most vertices.
+    if np.array(gt_mesh.vertices).shape[0] < np.array(mesh.vertices).shape[0]:
         gt_pcd = gt_mesh.sample_points_uniformly(
             number_of_points=np.array(mesh.vertices).shape[0]
         )
-        pcd = o3d.io.read_point_cloud(pred_ply_path)
+        pcd = o3d.geometry.PointCloud(points=o3d.utility.Vector3dVector(mesh.vertices))
+        geometric_dict["pcd"] = pcd
+        geometric_dict["gt_pcd_color"] = o3d.geometry.PointCloud(
+            points=o3d.utility.Vector3dVector(gt_mesh.vertices)
+        )  # for visualization
+        geometric_dict["gt_pcd"] = gt_pcd  # for F-score computation
     else:
-        gt_pcd = o3d.io.read_point_cloud(gt_ply_path)
+        gt_pcd = o3d.geometry.PointCloud(
+            points=o3d.utility.Vector3dVector(gt_mesh.vertices)
+        )
         pcd = mesh.sample_points_uniformly(
             number_of_points=np.array(gt_mesh.vertices).shape[0]
         )
+        geometric_dict["pcd"] = pcd  # for F-score computation
+        geometric_dict["pcd_color"] = o3d.geometry.PointCloud(
+            points=o3d.utility.Vector3dVector(mesh.vertices)
+        )  # for visualization
+        geometric_dict["gt_pcd"] = gt_pcd
 
     dist_threshold = dTau
 
@@ -143,10 +166,7 @@ def run_evaluation(
         std1,
         std2,
     ] = EvaluateHisto(
-        pcd,
-        mesh,
-        gt_pcd,
-        gt_mesh,
+        geometric_dict,
         dTau,
         out_dir,
         plot_stretch,

@@ -46,8 +46,6 @@ rc("text", usetex=True)  # if Latex is installed and executable on PATH
 
 
 def write_color_distances_mesh(path, mesh, distances, max_distance):
-    o3d.utility.set_verbosity_level(o3d.utility.VerbosityLevel.Debug)
-
     cmap = plt.get_cmap("hsv")
     distances = np.array(distances)
 
@@ -63,24 +61,19 @@ def write_color_distances_mesh(path, mesh, distances, max_distance):
 
 
 def EvaluateHisto(
-    source,
-    source_mesh,
-    target,
-    target_mesh,
+    geometric_dict,
     threshold,
     filename_mvs,
     plot_stretch,
     scene_name,
 ):
-    print("[EvaluateHisto]")
-    s = copy.deepcopy(source)
+    print("[Evaluate]")
+    s = copy.deepcopy(geometric_dict["pcd"])
 
-    print(filename_mvs + "/" + scene_name + ".precision.ply")
-
-    t = copy.deepcopy(target)
-    print("[compute_point_cloud_to_point_cloud_distance]")
+    t = copy.deepcopy(geometric_dict["gt_pcd"])
+    print("[compute distance from source to target]")
     distance1 = s.compute_point_cloud_distance(t)  # distance from source to target
-    print("[compute_point_cloud_to_point_cloud_distance]")
+    print("[compute distance from target to source]")
     distance2 = t.compute_point_cloud_distance(s)  # distance from target to source
 
     # plot histograms of the distances
@@ -89,7 +82,7 @@ def EvaluateHisto(
     bin_centers = 0.5 * (bins[:-1] + bins[1:])
 
     # scale values to interval [0,1]
-    max_col = threshold
+    max_col = 3 * threshold
     col = bin_centers - min(bin_centers)
 
     col /= max_col
@@ -130,11 +123,25 @@ def EvaluateHisto(
     source_n_fn = filename_mvs + "/" + scene_name + ".precision.ply"
     target_n_fn = filename_mvs + "/" + scene_name + ".recall.ply"
 
-    print("[ViewDistances] Add color coding to visualize error")
-    write_color_distances_mesh(source_n_fn, source_mesh, distance1, threshold)
+    print("[Add color coding to predicted mesh to visualize error]")
+    if "pcd_color" in geometric_dict:
+        distance1 = geometric_dict["pcd_color"].compute_point_cloud_distance(
+            t
+        )  # distance from source to target
+    write_color_distances_mesh(
+        source_n_fn, geometric_dict["mesh"], distance1, 3 * threshold
+    )
+    print("[Written to ", source_n_fn, "]")
 
-    print("[ViewDistances] Add color coding to visualize error")
-    write_color_distances_mesh(target_n_fn, target_mesh, distance2, threshold)
+    print("[Add color coding to target mesh to visualize error]")
+    if "gt_pcd_color" in geometric_dict:
+        distance2 = geometric_dict["gt_pcd_color"].compute_point_cloud_distance(
+            s
+        )  # distance from target to source
+    write_color_distances_mesh(
+        target_n_fn, geometric_dict["gt_mesh"], distance2, 3 * threshold
+    )
+    print("[Written to ", target_n_fn, "]")
 
     # get histogram and f-score
     [
