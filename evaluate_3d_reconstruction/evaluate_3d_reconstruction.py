@@ -51,7 +51,7 @@ def run_evaluation(
     pred_ply,
     path_to_pred_ply,
     scene,
-    distance_thresh=0.10,
+    distance_thresh=0.05,
     gt_translate_to_zero=False,
     pred_translate_to_zero=False,
 ):
