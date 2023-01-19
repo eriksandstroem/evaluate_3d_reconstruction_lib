@@ -1,4 +1,4 @@
-#!/cluster/project/cvl/esandstroem/virtual_envs/multisensor_env_python_gpu_3.8.5/bin/python
+#!/home/esandstroem/scratch/venvs/voxfusion_older_torch_env/bin/python
 
 # This script is modified from the original source by Erik Sandstroem
 
@@ -46,14 +46,39 @@ from evaluate_3d_reconstruction.evaluation import EvaluateHisto
 from evaluate_3d_reconstruction.util import make_dir
 from evaluate_3d_reconstruction.plot import plot_graph
 
+def get_align_transformation(rec_meshfile, gt_meshfile):
+    """
+    Get the transformation matrix to align the reconstructed mesh to the ground truth mesh.
+    """
+    o3d_rec_mesh = trimesh.load(rec_meshfile) 
+    o3d_gt_mesh = trimesh.load(gt_meshfile)
+    o3d_rec_pc = o3d.geometry.PointCloud(
+        points=o3d.utility.Vector3dVector(o3d_rec_mesh.vertices)
+    )
+    o3d_gt_pc = o3d.geometry.PointCloud(
+        points=o3d.utility.Vector3dVector(o3d_gt_mesh.vertices)
+    )
+    trans_init = np.eye(4)
+    threshold = 0.1
+    reg_p2p = o3d.pipelines.registration.registration_icp(
+        o3d_rec_pc,
+        o3d_gt_pc,
+        threshold,
+        trans_init,
+        o3d.pipelines.registration.TransformationEstimationPointToPoint(),
+    )
+    transformation = reg_p2p.transformation
+    return transformation
+
 
 def run_evaluation(
     pred_ply,
     path_to_pred_ply,
     scene,
-    distance_thresh=0.05,
+    distance_thresh=0.01,
     gt_translate_to_zero=False,
     pred_translate_to_zero=False,
+    icp_align=True,
 ):
     """Calculates the F-score from a predicted mesh to a reference mesh. Generates
     a directory and fills this with numerical and mesh results.
@@ -65,6 +90,7 @@ def run_evaluation(
             distance_threshold (float):
             gt_translate_to_zero (bool): boolean describing whether to transform gt to origin
             pred_translate_to_zero (bool): boolean describing whether to transform prediction to origin
+            icp_align (bool): align the recontructed mesh with the gt using ICP
 
         Returns:
             None
@@ -94,7 +120,13 @@ def run_evaluation(
 
     # Load reconstruction and corresponding GT
     # Using trimesh to load because sometimes open3d fails loading .ply files
+		
     mesh = trimesh.load(pred_ply_path)
+    if icp_align:
+        transformation = get_align_transformation(pred_ply_path, gt_ply_path)
+        print("Rigid Transform Applied to Reconstructed Mesh: ", transformation)
+        mesh = mesh.apply_transform(transformation)
+
     mesh = o3d.geometry.TriangleMesh(
         vertices=o3d.utility.Vector3dVector(mesh.vertices),
         triangles=o3d.utility.Vector3iVector(mesh.faces),
@@ -208,6 +240,15 @@ def run_evaluation(
         plot_stretch,
         out_dir,
     )
+
+    return {
+         "dist_threshold": dTau,
+         "precision": eva[0],
+         "recall": eva[1],
+         "f-score": eva[2],
+         "mean precision": mean1,
+         "mean recall": mean2}
+         )
 
 
 if __name__ == "__main__":
