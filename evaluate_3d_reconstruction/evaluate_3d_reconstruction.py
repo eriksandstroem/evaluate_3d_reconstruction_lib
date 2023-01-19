@@ -104,9 +104,6 @@ def run_evaluation(
     else:
         gt_ply_path = full_path_to_gt_ply
 
-    # specify path to ground truth mesh
-    gt_ply_path = ground_truth_data_base + "/" + scene + ".ply"
-
     # full path to predicted mesh
     pred_ply_path = path_to_pred_ply + "/" + pred_ply
 
