@@ -79,6 +79,7 @@ def run_evaluation(
     gt_translate_to_zero=False,
     pred_translate_to_zero=False,
     icp_align=True,
+    full_path_to_gt_ply=None,
 ):
     """Calculates the F-score from a predicted mesh to a reference mesh. Generates
     a directory and fills this with numerical and mesh results.
@@ -91,10 +92,17 @@ def run_evaluation(
             gt_translate_to_zero (bool): boolean describing whether to transform gt to origin
             pred_translate_to_zero (bool): boolean describing whether to transform prediction to origin
             icp_align (bool): align the recontructed mesh with the gt using ICP
+            full_path_to_gt_ply (string): specify full path to ground truth mesh
 
         Returns:
             None
     """
+
+    # specify path to ground truth mesh
+    if full_path_to_gt_ply is None:
+        gt_ply_path = ground_truth_data_base + "/" + scene + ".ply"
+    else:
+        gt_ply_path = full_path_to_gt_ply
 
     # specify path to ground truth mesh
     gt_ply_path = ground_truth_data_base + "/" + scene + ".ply"
