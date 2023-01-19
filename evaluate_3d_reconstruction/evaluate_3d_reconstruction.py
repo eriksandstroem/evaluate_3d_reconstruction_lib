@@ -247,8 +247,8 @@ def run_evaluation(
          "recall": eva[1],
          "f-score": eva[2],
          "mean precision": mean1,
-         "mean recall": mean2}
-         )
+         "mean recall": mean2
+         }
 
 
 if __name__ == "__main__":
