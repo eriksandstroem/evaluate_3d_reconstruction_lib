@@ -17,7 +17,7 @@ The library has been tested with the following dependencies
 2. If you don't want to provide the full path to the ground truth mesh when you call the evaluation script, you can specify the path to the folder containing the ground truth meshes in a hard coded way (not recommended). Open the file <pre><code>evaluate_3d_reconstruction/evaluate_3d_reconstruction/config.py</code></pre> and revise the path to where you store the ground truth meshes. 
 3. Then open the file <pre><code>evaluate_3d_reconstruction/evaluate_3d_reconstruction/evaluate_3d_reconstruction.py</code></pre> and revise the shebang at the top to point to the python executable of your virtual environment (this can be useful if you want to execute the evaluation script directly from the command line (see below)).
 4. Activate your virtual environment
-5. Enter the root folder of the library: <pre><code>cd evaluate_3d_reconstruction</code></pre>
+5. Enter the root folder of the library: <pre><code>cd evaluate_3d_reconstruction_lib</code></pre>
 6. Install the library: <pre><code>pip install .</code></pre>
  
 ### Usage
