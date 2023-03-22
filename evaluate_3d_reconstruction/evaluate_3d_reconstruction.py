@@ -260,9 +260,11 @@ if __name__ == "__main__":
 
     pred_ply = argv[1]  # name of predicted .ply file
     scene = argv[2]  # scene name
+    full_path_to_gt_ply = argv[3]
 
     run_evaluation(
         pred_ply=pred_ply,
         path_to_pred_ply=str(pathlib.Path().absolute()),
         scene=scene,
+	full_path_to_gt_ply=full_path_to_gt_ply,
     )
