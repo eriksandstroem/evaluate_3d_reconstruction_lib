@@ -5,7 +5,7 @@ This is a modified version of the F-score evaluation of 3D meshes provided by [*
 For improved evaluation realism, this version does not crop or downsample the meshes.
 
 ### Prerequisites
-The library has been tested with the following dependencies
+The library has been tested with the following dependencies, but should work with other versions as well.
 
 1. Python 3.8.5
 2. Open3D 0.9.0
@@ -34,6 +34,8 @@ The main function of the library is
             distance_threshold (float):
             gt_translate_to_zero (bool): boolean describing whether to translate gt mesh to origin
             pred_translate_to_zero (bool): boolean describing whether to translate predicted mesh to origin
+            icp_align (bool): align the recontructed mesh with the gt using ICP
+            full_path_to_gt_ply (string): specify full path to ground truth mesh
 
         Returns:
             None
