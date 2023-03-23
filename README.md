@@ -2,10 +2,10 @@
 
 This is a modified version of the F-score evaluation of 3D meshes provided by [**Thanks and Temples**](https://github.com/isl-org/TanksAndTemples/tree/master/python_toolbox/evaluation). 
 
-For improved evaluation realism, this version does not crop or downsample the meshes and assumes that the predicted and target meshes are already aligned.
+For improved evaluation realism, this version does not crop or downsample the meshes.
 
 ### Prerequisites
-The library has been tested with the following dependencies
+The library has been tested with the following dependencies, but should work with other versions as well.
 
 1. Python 3.8.5
 2. Open3D 0.9.0
@@ -14,10 +14,11 @@ The library has been tested with the following dependencies
 ## Installation
 
 1. Clone the repository to your local directory: <pre><code>git clone https://github.com/tfy14esa/evaluate_3d_reconstruction_lib.git</code></pre>
-2. Open the file <pre><code>evaluate_3d_reconstruction/evaluate_3d_reconstruction/config.py</code></pre> and revise the path to where you store the ground truth meshes. Then open the file <pre><code>evaluate_3d_reconstruction/evaluate_3d_reconstruction/evaluate_3d_reconstruction.py</code></pre> and revise the shebang at the top to point to the python executable of your virtual environment (this can be useful if you want to execute the evaluation script directly from the command line (see below)).
-2. Activate your virtual environment
-3. Enter the root folder of the library: <pre><code>cd evaluate_3d_reconstruction</code></pre>
-4. Install the library: <pre><code>pip install .</code></pre>
+2. If you don't want to provide the full path to the ground truth mesh when you call the evaluation script, you can specify the path to the folder containing the ground truth meshes in a hard coded way (not recommended). Open the file <pre><code>evaluate_3d_reconstruction/evaluate_3d_reconstruction/config.py</code></pre> and revise the path to where you store the ground truth meshes. 
+3. Then open the file <pre><code>evaluate_3d_reconstruction/evaluate_3d_reconstruction/evaluate_3d_reconstruction.py</code></pre> and revise the shebang at the top to point to the python executable of your virtual environment (this can be useful if you want to execute the evaluation script directly from the command line (see below)).
+4. Activate your virtual environment
+5. Enter the root folder of the library: <pre><code>cd evaluate_3d_reconstruction_lib</code></pre>
+6. Install the library: <pre><code>pip install .</code></pre>
  
 ### Usage
 
@@ -33,6 +34,8 @@ The main function of the library is
             distance_threshold (float):
             gt_translate_to_zero (bool): boolean describing whether to translate gt mesh to origin
             pred_translate_to_zero (bool): boolean describing whether to translate predicted mesh to origin
+            icp_align (bool): align the recontructed mesh with the gt using ICP
+            full_path_to_gt_ply (string): specify full path to ground truth mesh
 
         Returns:
             None
@@ -42,7 +45,7 @@ The main function of the library is
 The main function can be called in two principled ways:
 
 1. As an executable directly from the command line as:
-<pre><code>evaluate_3d_reconstruction.py pred_ply scene</code></pre> To achieve this, run <pre><code>chmod +x evaluate_3d_reconstruction.py</code></pre> and export the path to the script in your bashrc-file i.e. add similar to the following to your bashrc: <pre><code># Export path to my python evaluate 3d reconstruction script
+<pre><code>evaluate_3d_reconstruction.py pred_ply scene full_path_to_gt_ply</code></pre> To achieve this, run <pre><code>chmod +x evaluate_3d_reconstruction.py</code></pre> and export the path to the script in your bashrc-file i.e. add similar to the following to your bashrc: <pre><code># Export path to my python evaluate 3d reconstruction script
 export PATH="/cluster/project/cvl/esandstroem/src/late_fusion_3dconv/deps/evaluate_3d_reconstruction/evaluate_3d_reconstruction:$PATH"</code></pre>
 
 2. As a normal function in other python scripts. To achieve this, simply import the function using <pre><code>from evaluate_3d_reconstruction import run_evaluation</code></pre>
