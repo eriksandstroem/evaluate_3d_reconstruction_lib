@@ -97,7 +97,7 @@ def run_evaluation(
         Returns:
             None
     """
-
+    print("Align: ", icp_align)
     # specify path to ground truth mesh
     if full_path_to_gt_ply is None:
         gt_ply_path = ground_truth_data_base + "/" + scene + ".ply"
