@@ -108,7 +108,7 @@ def run_evaluation(
     pred_ply_path = path_to_pred_ply + "/" + pred_ply
 
     # output directory
-    out_dir = path_to_pred_ply + "/" + pred_ply[:-4]
+    out_dir = path_to_pred_ply + "/" + "evaluation_results"
 
     # create output directory
     make_dir(out_dir)
