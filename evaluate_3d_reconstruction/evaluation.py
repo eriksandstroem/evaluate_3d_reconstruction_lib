@@ -33,6 +33,7 @@
 
 import json
 import copy
+import shutil
 import numpy as np
 import open3d as o3d
 import matplotlib.pyplot as plt
@@ -42,7 +43,7 @@ import matplotlib
 matplotlib.use("Agg")
 
 rc("font", **{"family": "serif", "sans-serif": ["Times New Roman"]})
-rc("text", usetex=True)  # if Latex is installed and executable on PATH
+rc("text", usetex=True if shutil.which('latex') else False)  # if Latex is installed and executable on PATH
 
 
 def write_color_distances_mesh(path, mesh, distances, max_distance):

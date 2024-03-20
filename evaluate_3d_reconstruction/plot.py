@@ -35,13 +35,13 @@
 # The dataset has a different license, please refer to
 # https://tanksandtemples.org/license/
 
-
+import shutil
 import matplotlib.pyplot as plt
 from cycler import cycler
 from matplotlib import rc
 
 rc("font", **{"family": "serif", "sans-serif": ["Times New Roman"]})
-rc("text", usetex=True)
+rc("text", usetex=True if shutil.which('latex') else False)  # if Latex is installed and executable on PATH
 
 
 def plot_graph(
